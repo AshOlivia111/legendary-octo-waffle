@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌍 世界旅游攻略地图 · 真实国界版</title>
+<title>🌍 世界旅游攻略地图</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box;
       font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
@@ -29,33 +29,40 @@
   }
   .map-header p { color:#7fa6c9; font-size:.9rem; margin-top:.4rem; }
 
-  /* ===== 地图 SVG ===== */
-  .world-map {
-    display:block; width:100%; height:auto;
+  #mapWrap {
     background: radial-gradient(circle at 50% 40%,#0e2038,#081422);
     border-radius: 1.2rem;
     box-shadow: inset 0 0 40px rgba(0,0,0,.6);
-    cursor: grab;
+    overflow: hidden;
   }
-  .world-map:active { cursor: grabbing; }
+  .world-map {
+    display:block; width:100%; height:auto;
+    cursor: default;
+  }
 
   .country {
-    fill:#2b5a7a;
-    stroke:#0d1f30;
-    stroke-width:0.5;
+    fill:#2b5a7a; stroke:#0d1f30; stroke-width:0.5;
     cursor:pointer;
     transition: fill .2s, stroke .2s, filter .2s;
   }
   .country:hover {
-    fill:#ffd966;
-    stroke:#fff;
-    stroke-width:1.2;
+    fill:#ffd966; stroke:#fff; stroke-width:1.2;
     filter: drop-shadow(0 0 6px rgba(255,225,120,.9));
   }
   .country.has-guide { fill:#4d8b9c; }
   .country.has-guide:hover { fill:#ffd966; }
 
-  /* ===== 一级：预览弹窗 ===== */
+  .country.china {
+    fill:#4d8b9c;
+    stroke:#f0b840;
+    stroke-width:1.5;
+  }
+  .country.china:hover {
+    fill:#ffd966;
+    stroke:#fff;
+  }
+
+  /* 一级：预览弹窗 */
   .preview-overlay {
     position:fixed; inset:0; background:rgba(3,10,20,.7);
     backdrop-filter: blur(6px);
@@ -67,8 +74,7 @@
   .preview-card {
     background:#0f2135; border-radius:1.5rem;
     max-width:360px; width:100%; overflow:hidden;
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,1),
-                0 0 0 1px rgba(120,180,255,.12);
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,1);
     animation: pop .25s cubic-bezier(.2,.8,.3,1);
     cursor:pointer; transition: transform .2s;
   }
@@ -108,9 +114,8 @@
   }
   .preview-cta .arrow { transition: transform .2s; }
   .preview-card:hover .arrow { transform: translateX(4px); }
-  .preview-cta.disabled { color:#5a7a96; cursor:not-allowed; }
 
-  /* ===== 二级：详细攻略全屏页 ===== */
+  /* 二级：详细攻略全屏页 */
   .detail-overlay {
     position:fixed; inset:0; background:#081422;
     display:none; z-index:1000; overflow-y:auto;
@@ -245,22 +250,39 @@
     font-size:.82rem; color:#9fc0dd;
   }
 
-  /* 无攻略提示 */
-  .no-guide {
-    text-align:center; padding:3rem 2rem; color:#7fa6c9;
+  /* 中国省级地图弹层 */
+  .china-modal {
+    position:fixed; inset:0; background:#081422;
+    display:none; z-index:1500;
+    opacity:0; transition:opacity .25s;
   }
-  .no-guide .big { font-size:3rem; margin-bottom:1rem; }
+  .china-modal.active { display:block; opacity:1; }
+  .china-modal iframe {
+    width:100%; height:100%; border:none; display:block;
+  }
+  .china-modal-close {
+    position:fixed; top:1rem; right:1rem; z-index:1600;
+    background:rgba(10,25,40,.85); border:none; color:#cfe3f7;
+    width:44px; height:44px; border-radius:50%;
+    font-size:1.3rem; cursor:pointer;
+    backdrop-filter:blur(6px); transition:.2s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .china-modal-close:hover {
+    background:#2e5b80; color:#fff; transform:rotate(90deg);
+  }
 
-  /* 加载提示 */
-  .loading {
-    text-align:center; padding:3rem; color:#7fa6c9;
+  #toast {
+    position:fixed; left:50%; bottom:2rem; transform:translateX(-50%);
+    background:rgba(20,45,70,.95); color:#cfe3f7;
+    padding:.6rem 1.2rem; border-radius:2rem; font-size:.9rem;
+    border:1px solid #2a5a80; z-index:2000;
+    box-shadow:0 10px 30px -8px rgba(0,0,0,.8);
+    backdrop-filter: blur(6px);
+    opacity:0; pointer-events:none;
+    transition:opacity .3s, transform .3s;
   }
-  .loading .spinner {
-    width:40px; height:40px; margin:0 auto 1rem;
-    border:3px solid #1d3a55; border-top-color:#4fa3e3;
-    border-radius:50%; animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   @media (max-width:600px) {
     .map-container { padding:1rem; }
@@ -277,18 +299,17 @@
 <div class="map-container">
   <div class="map-header">
     <h1>🌍 世界旅游攻略地图</h1>
-    <p>点击国家 · 预览 · 查看详细攻略</p>
+    <p>点击国家 · 预览 · 查看详细攻略 ｜ 🇨🇳 点击中国可进入省级地图</p>
   </div>
 
   <div id="mapWrap">
-    <div class="loading">
-      <div class="spinner"></div>
+    <div style="padding:3rem;text-align:center;color:#7fa6c9;">
       正在加载世界地图...
     </div>
   </div>
 </div>
 
-<!-- ===== 一级：预览弹窗 ===== -->
+<!-- 一级：预览弹窗 -->
 <div class="preview-overlay" id="previewOverlay">
   <div class="preview-card" id="previewCard">
     <div class="preview-cover" id="previewCover">
@@ -296,165 +317,85 @@
     </div>
     <div class="preview-body">
       <div class="preview-desc" id="previewDesc"></div>
-      <div class="preview-cta" id="previewCta">
-        <span id="ctaText">查看详细攻略</span>
+      <div class="preview-cta">
+        <span>查看详细攻略</span>
         <span class="arrow">→</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== 二级：详细攻略全屏页 ===== -->
+<!-- 二级：详细攻略全屏页 -->
 <div class="detail-overlay" id="detailOverlay">
   <button class="detail-close" id="detailClose">✕</button>
   <div class="detail-page" id="detailPage"></div>
 </div>
 
-<!-- D3 + TopoJSON -->
+<!-- 中国省级地图弹层 -->
+<div class="china-modal" id="chinaModal">
+  <button class="china-modal-close" id="chinaModalClose">✕</button>
+  <iframe id="chinaFrame" src="" frameborder="0"></iframe>
+</div>
+
+<!-- 轻提示 -->
+<div id="toast"></div>
+
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="https://unpkg.com/topojson-client@3"></script>
 
 <script>
 /* =========================================================
-   🌟 攻略数据：key 用国家英文名（小写），和 GeoJSON 里的 name 对应
-   只有这里配置了的国家才可点进详细攻略
+   攻略数据
    ========================================================= */
 const regionData = {
-
   'iceland': {
-    name: '冰岛',
-    emoji: '🇮🇸',
+    name: '冰岛', emoji: '🇮🇸',
     cover: 'https://picsum.photos/id/1019/900/500',
     preview: '冰与火交织的岛国，冰川、火山、瀑布、极光与地热温泉共存。',
-    intro: '冰岛是北大西洋上的岛国，以极致自然风光闻名。夏季有午夜阳光，冬季可追逐极光。环岛公路全长约1332公里，是探索冰岛的最佳方式。',
+    intro: '冰岛是北大西洋上的岛国，以极致自然风光闻名。',
     itinerary: [
-      { day: 'Day 1', text: '抵达雷克雅未克，市区漫步，哈尔格林姆斯教堂、太阳航海者雕塑。' },
-      { day: 'Day 2', text: '黄金圈：辛格维利尔国家公园 → 盖歇尔间歇泉 → 黄金瀑布。' },
-      { day: 'Day 3', text: '南岸：塞里雅兰瀑布 → 斯科加瀑布 → 黑沙滩 → 维克镇。' },
-      { day: 'Day 4', text: '瓦特纳冰川 → 杰古沙龙冰河湖 → 钻石沙滩。' },
-      { day: 'Day 5', text: '东部峡湾 → 埃伊尔斯塔济，沿途小镇风光。' },
-      { day: 'Day 6', text: '米湖地区：地热区、火山口、黑暗城堡。' },
-      { day: 'Day 7', text: '阿克雷里 → 返回雷克雅未克，蓝湖温泉泡汤。' }
+      { day: 'Day 1', text: '抵达雷克雅未克，市区漫步。' },
+      { day: 'Day 2', text: '黄金圈：辛格维利尔国家公园 → 盖歇尔间歇泉 → 黄金瀑布。' }
     ],
     spots: [
-      { name: '黄金圈', desc: '冰岛最经典的旅游路线', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '免费' },
-      { name: '蓝湖温泉', desc: '乳蓝色地热温泉', img: 'https://picsum.photos/id/1016/400/250', time: '3-4小时', ticket: '约60欧起' },
-      { name: '杰古沙龙冰河湖', desc: '冰山漂浮的潟湖', img: 'https://picsum.photos/id/1018/400/250', time: '2小时', ticket: '免费' },
-      { name: '黑沙滩', desc: '玄武岩与巨浪', img: 'https://picsum.photos/id/1000/400/250', time: '1小时', ticket: '免费' },
-      { name: '斯科加瀑布', desc: '常出现双彩虹', img: 'https://picsum.photos/id/1003/400/250', time: '1小时', ticket: '免费' },
-      { name: '米湖', desc: '北部地热奇观', img: 'https://picsum.photos/id/1019/400/250', time: '半天', ticket: '部分收费' }
+      { name: '黄金圈', desc: '冰岛最经典的旅游路线', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '免费' }
     ],
-    foods: ['冰岛热狗', '羊肉汤', '龙虾汤', 'Skyr酸奶', '黑麦面包', '发酵鲨鱼肉'],
-    tips: [
-      '建议安排 8-10 天环岛，节奏最舒服',
-      '6-8月旺季，酒店和项目务必提前预订',
-      '黑沙滩注意「夺命巨浪」，不要靠近海浪',
-      '冰岛物价偏高，超市 Bónus 采购可节省开支'
-    ],
+    foods: ['冰岛热狗', '羊肉汤', '龙虾汤'],
+    tips: ['建议安排 8-10 天环岛', '6-8月旺季务必提前预订'],
     info: { best: '6-8月 / 12-1月', lang: '冰岛语/英语', currency: '冰岛克朗' }
   },
-
   'norway': {
-    name: '挪威',
-    emoji: '🇳🇴',
+    name: '挪威', emoji: '🇳🇴',
     cover: 'https://picsum.photos/id/1015/900/500',
     preview: '峡湾之国，拥有壮丽的自然风光和北极光。',
-    intro: '挪威以峡湾、午夜太阳和北极光闻名，是北欧自然景观的代表。',
-    itinerary: [
-      { day: 'Day 1', text: '奥斯陆市区：歌剧院、维格兰雕塑公园。' },
-      { day: 'Day 2', text: '松恩峡湾一日游，弗洛姆铁路。' },
-      { day: 'Day 3', text: '卑尔根：布吕根码头、鱼市。' }
-    ],
-    spots: [
-      { name: '松恩峡湾', desc: '世界最长最深峡湾', img: 'https://picsum.photos/id/1015/400/250', time: '1天', ticket: '游船约500克朗' },
-      { name: '布道石', desc: '吕瑟峡湾悬崖', img: 'https://picsum.photos/id/1016/400/250', time: '4-5小时', ticket: '免费' }
-    ],
-    foods: ['三文鱼', '棕色奶酪', '羊肉炖菜', '华夫饼'],
-    tips: ['夏季最佳', '峡湾游船提前订', '物价高，自带水壶'],
+    intro: '挪威以峡湾、午夜太阳和北极光闻名。',
+    itinerary: [{ day: 'Day 1', text: '奥斯陆市区：歌剧院、维格兰雕塑公园。' }],
+    spots: [{ name: '松恩峡湾', desc: '世界最长最深峡湾', img: 'https://picsum.photos/id/1015/400/250', time: '1天', ticket: '游船约500克朗' }],
+    foods: ['三文鱼', '棕色奶酪'],
+    tips: ['夏季最佳', '峡湾游船提前订'],
     info: { best: '6-8月', lang: '挪威语/英语', currency: '挪威克朗' }
   },
-
-  'sweden': {
-    name: '瑞典',
-    emoji: '🇸🇪',
-    cover: 'https://picsum.photos/id/1016/900/500',
-    preview: '北欧设计之国，森林湖泊与极简生活。',
-    intro: '瑞典以设计、音乐和自然风光著称，适合慢旅行。',
-    itinerary: [
-      { day: 'Day 1', text: '斯德哥尔摩：老城、瓦萨博物馆。' },
-      { day: 'Day 2', text: '皇后岛宫、北欧博物馆。' }
-    ],
-    spots: [
-      { name: '斯德哥尔摩老城', desc: '彩色房屋与石板路', img: 'https://picsum.photos/id/1018/400/250', time: '半天', ticket: '免费' },
-      { name: '基律纳', desc: '极光与冰旅馆', img: 'https://picsum.photos/id/1019/400/250', time: '2天', ticket: '项目另计' }
-    ],
-    foods: ['瑞典肉丸', '腌鲱鱼', '肉桂卷', '越橘酱'],
-    tips: ['冬季北部极光', '夏季午夜阳光', '刷卡普及，少用现金'],
-    info: { best: '6-8月 / 12-2月', lang: '瑞典语/英语', currency: '瑞典克朗' }
-  },
-
-  'finland': {
-    name: '芬兰',
-    emoji: '🇫🇮',
+  'japan': {
+    name: '日本', emoji: '🇯🇵',
     cover: 'https://picsum.photos/id/1018/900/500',
-    preview: '千湖之国，圣诞老人的故乡。',
-    intro: '芬兰以湖泊、森林、桑拿和极光闻名，是冬季旅行的热门目的地。',
-    itinerary: [
-      { day: 'Day 1', text: '赫尔辛基：岩石教堂、集市广场。' },
-      { day: 'Day 2', text: '罗瓦涅米：圣诞老人村、北极圈。' }
-    ],
-    spots: [
-      { name: '圣诞老人村', desc: '北极圈上的童话', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '免费入场' },
-      { name: '萨利色尔卡', desc: '极光玻璃屋', img: 'https://picsum.photos/id/1016/400/250', time: '2-3天', ticket: '住宿另计' }
-    ],
-    foods: ['卡累利阿派', '驯鹿肉', '三文鱼汤', '黑麦面包'],
-    tips: ['冬季极光最佳', '桑拿文化体验', '保暖装备必备'],
-    info: { best: '12-3月 / 6-8月', lang: '芬兰语/英语', currency: '欧元' }
-  },
-
-  'denmark': {
-    name: '丹麦',
-    emoji: '🇩🇰',
-    cover: 'https://picsum.photos/id/1000/900/500',
-    preview: '童话王国，安徒生的故乡。',
-    intro: '丹麦以童话、设计和幸福生活闻名，哥本哈根是必去城市。',
-    itinerary: [
-      { day: 'Day 1', text: '哥本哈根：小美人鱼、新港、蒂沃利公园。' },
-      { day: 'Day 2', text: '欧登塞：安徒生博物馆。' }
-    ],
-    spots: [
-      { name: '新港', desc: '彩色房屋与运河', img: 'https://picsum.photos/id/1018/400/250', time: '2小时', ticket: '免费' },
-      { name: '小美人鱼', desc: '哥本哈根地标', img: 'https://picsum.photos/id/1019/400/250', time: '1小时', ticket: '免费' }
-    ],
-    foods: ['丹麦酥', '开放式三明治', '猪肉丸', '热狗'],
-    tips: ['自行车城市', '夏季最佳', '乐高乐园适合亲子'],
-    info: { best: '5-9月', lang: '丹麦语/英语', currency: '丹麦克朗' }
+    preview: '樱花、古寺、温泉与美食。',
+    intro: '日本由本州、北海道、九州、四国等岛屿组成。',
+    itinerary: [{ day: 'Day 1', text: '抵达东京，浅草寺、晴空塔。' }],
+    spots: [{ name: '伏见稻荷大社', desc: '千本鸟居', img: 'https://picsum.photos/id/1015/400/250', time: '2-3小时', ticket: '免费' }],
+    foods: ['寿司', '拉面', '和牛'],
+    tips: ['建议购买 JR Pass', '樱花季需提前订酒店'],
+    info: { best: '3-5月 / 10-11月', lang: '日语', currency: '日元' }
   }
-
 };
 
-/* 国家名匹配：GeoJSON 里的 name 可能是多种写法，统一转小写比对 */
-function normalizeName(name) {
-  return (name || '').toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/-/g, '')
-    .replace(/’/g, "'");
-}
-
-/* 建立索引：把 regionData 的 key 也做同样处理 */
-const guideIndex = {};
-Object.keys(regionData).forEach(k => {
-  guideIndex[normalizeName(k)] = k;
-});
-
 /* =========================================================
-   渲染地图
+   渲染世界地图
    ========================================================= */
 const mapWrap = document.getElementById('mapWrap');
 const width = 960, height = 500;
 
 const svg = d3.select('#mapWrap')
-  .html('')  // 清空 loading
+  .html('')
   .append('svg')
   .attr('class', 'world-map')
   .attr('viewBox', `0 0 ${width} ${height}`)
@@ -466,7 +407,25 @@ const projection = d3.geoNaturalEarth1()
 
 const path = d3.geoPath().projection(projection);
 
-/* 加载世界地图 TopoJSON */
+function normalizeName(name) {
+  return (name || '').toLowerCase()
+    .replace(/\s+/g, '').replace(/-/g, '').replace(/’/g, "'");
+}
+
+const guideIndex = {};
+Object.keys(regionData).forEach(k => {
+  guideIndex[normalizeName(k)] = k;
+});
+
+/* 中国识别：模糊匹配 */
+function isChina(name) {
+  if (!name) return false;
+  const n = String(name).toLowerCase();
+  return n.includes('chin') || n.includes('中国') ||
+         n.includes('taiwan') || n.includes('hong') ||
+         n.includes('macau');
+}
+
 const worldUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
 d3.json(worldUrl).then(world => {
@@ -477,53 +436,70 @@ d3.json(worldUrl).then(world => {
     .data(countries)
     .join('path')
     .attr('class', d => {
-      const key = guideIndex[normalizeName(d.properties.name)];
+      const name = d.properties.name;
+      if (isChina(name)) return 'country china';
+      const key = guideIndex[normalizeName(name)];
       return 'country' + (key ? ' has-guide' : '');
     })
     .attr('d', path)
-    .attr('data-country', d => {
-      const key = guideIndex[normalizeName(d.properties.name)];
-      return key || '';
-    })
     .on('click', (event, d) => {
-      const key = guideIndex[normalizeName(d.properties.name)];
+      const name = d.properties.name;
+
+      if (isChina(name)) {
+        openChinaMap();
+        return;
+      }
+
+      const key = guideIndex[normalizeName(name)];
       if (key) {
         openPreview(key);
       } else {
-        // 没有攻略的国家，给一个轻提示
-        showToast(`${d.properties.name} 暂无攻略`);
+        showToast(`${name} 暂无攻略`);
       }
     });
 
 }).catch(err => {
   console.error(err);
-  mapWrap.innerHTML = '<div class="loading">地图加载失败，请检查网络后刷新</div>';
+  mapWrap.innerHTML = '<div style="padding:3rem;text-align:center;color:#ff9e9e;">地图加载失败，请检查网络后刷新。</div>';
 });
 
 /* =========================================================
-   一级：预览弹窗
+   中国弹层
+   ========================================================= */
+const chinaModal = document.getElementById('chinaModal');
+const chinaFrame = document.getElementById('chinaFrame');
+
+function openChinaMap() {
+  chinaFrame.src = './china.html';
+  chinaModal.classList.add('active');
+}
+
+function closeChinaMap() {
+  chinaModal.classList.remove('active');
+  setTimeout(() => { chinaFrame.src = ''; }, 300);
+}
+
+document.getElementById('chinaModalClose')
+  .addEventListener('click', closeChinaMap);
+
+/* =========================================================
+   一级：预览
    ========================================================= */
 const previewOverlay = document.getElementById('previewOverlay');
 const previewCard    = document.getElementById('previewCard');
 const previewCover   = document.getElementById('previewCover');
 const previewTitle   = document.getElementById('previewTitle');
 const previewDesc    = document.getElementById('previewDesc');
-const previewCta     = document.getElementById('previewCta');
-const ctaText        = document.getElementById('ctaText');
 
 let currentKey = null;
 
 function openPreview(key) {
   const data = regionData[key];
   if (!data) return;
-
   currentKey = key;
   previewCover.style.backgroundImage = `url('${data.cover}')`;
   previewTitle.innerHTML = `<span>${data.emoji}</span>${data.name}`;
   previewDesc.textContent = data.preview || data.intro;
-  ctaText.textContent = '查看详细攻略';
-  previewCta.classList.remove('disabled');
-
   previewOverlay.classList.add('active');
 }
 
@@ -611,37 +587,22 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     previewOverlay.classList.remove('active');
     detailOverlay.classList.remove('active');
+    if (chinaModal.classList.contains('active')) closeChinaMap();
   }
 });
 
 /* =========================================================
-   轻提示（无攻略国家点击时）
+   轻提示
    ========================================================= */
+const toast = document.getElementById('toast');
 let toastTimer = null;
-function showToast(msg) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.style.cssText = `
-      position:fixed; left:50%; bottom:2rem; transform:translateX(-50%);
-      background:rgba(20,45,70,.95); color:#cfe3f7;
-      padding:.6rem 1.2rem; border-radius:2rem; font-size:.9rem;
-      border:1px solid #2a5a80; z-index:2000;
-      box-shadow:0 10px 30px -8px rgba(0,0,0,.8);
-      transition:opacity .3s, transform .3s;
-      backdrop-filter: blur(6px);
-    `;
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.style.opacity = '1';
-  toast.style.transform = 'translateX(-50%) translateY(0)';
 
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(10px)';
+    toast.classList.remove('show');
   }, 1800);
 }
 </script>
