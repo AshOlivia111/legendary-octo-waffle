@@ -413,10 +413,9 @@ const mapWrap = document.getElementById('mapWrap');
 
 // 用等积圆锥投影，适合中国地图
 const width = 960, height = 720;
-const projection = d3.geoConicEqualArea()
-  .scale(800)
+const projection = d3.geoMercator()
   .center([104, 36])
-  .parallels([25, 47])
+  .scale(600)
   .translate([width / 2, height / 2]);
 
 const path = d3.geoPath().projection(projection);
