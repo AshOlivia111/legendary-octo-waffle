@@ -322,9 +322,7 @@ d3.json('./china-provinces.json').then(china => {
 
   // 关键：用 fitSize 自动适应，不管数据多大都会自动缩放
   const collection = { type: 'FeatureCollection', features: features };
-  const projection = d3.geoConicEqualArea()
-  .parallels([25, 47])
-  .rotate([-105, 0])
+  const projection = d3.geoEquirectangular()
   .fitSize([width - 40, height - 40], collection);
   const path = d3.geoPath().projection(projection);
 
