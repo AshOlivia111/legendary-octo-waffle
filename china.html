@@ -310,7 +310,7 @@ const svg = d3.select('#mapWrap')
   .html('')
   .append('svg')
   .attr('class', 'china-map')
-  .attr('viewBox', ``0 0 ${width} ${height}`)
+  .attr('viewBox', `0 0 ${width} ${height}`)
   .attr('preserveAspectRatio', 'xMidYMid meet');
 
 d3.json('./china-provinces.json').then(china => {
