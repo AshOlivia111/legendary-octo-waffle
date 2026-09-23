@@ -7,13 +7,11 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box;
       font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
-
   body {
     background: linear-gradient(160deg,#0a1628,#0f2438 60%,#0a1a2f);
     min-height:100vh; display:flex; align-items:center;
     justify-content:center; padding:1.5rem;
   }
-
   .map-container {
     background: rgba(16,42,67,.85);
     backdrop-filter: blur(8px);
@@ -35,34 +33,23 @@
     box-shadow: inset 0 0 40px rgba(0,0,0,.6);
     overflow: hidden;
   }
-  .china-map {
-    display:block; width:100%; height:auto;
-    cursor: default;
-  }
+  .china-map { display:block; width:100%; height:auto; }
 
   .province {
-    fill:#2b5a7a;
-    stroke:#0d1f30;
-    stroke-width:0.6;
+    fill:#2b5a7a; stroke:#0d1f30; stroke-width:0.6;
     cursor:pointer;
     transition: fill .2s, stroke .2s, filter .2s;
   }
   .province:hover {
-    fill:#ffd966;
-    stroke:#fff;
-    stroke-width:1.2;
+    fill:#ffd966; stroke:#fff; stroke-width:1.2;
     filter: drop-shadow(0 0 8px rgba(255,225,120,.9));
   }
   .province.has-guide { fill:#4d8b9c; }
   .province.has-guide:hover { fill:#ffd966; }
+  .nanhai-line { fill:none; stroke:#3a6a8a; stroke-width:0.8;
+    stroke-dasharray:4 3; pointer-events:none; }
 
-  /* 南海诸岛示意线 */
-  .nanhai-line {
-    fill:none; stroke:#3a6a8a; stroke-width:0.8;
-    stroke-dasharray:4 3; pointer-events:none;
-  }
-
-  /* ===== 一级：预览弹窗 ===== */
+  /* 弹窗样式 */
   .preview-overlay {
     position:fixed; inset:0; background:rgba(3,10,20,.7);
     backdrop-filter: blur(6px);
@@ -70,21 +57,15 @@
     padding:1.2rem; z-index:900;
   }
   .preview-overlay.active { display:flex; }
-
   .preview-card {
     background:#0f2135; border-radius:1.5rem;
     max-width:360px; width:100%; overflow:hidden;
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,1),
-                0 0 0 1px rgba(120,180,255,.12);
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,1);
     animation: pop .25s cubic-bezier(.2,.8,.3,1);
     cursor:pointer; transition: transform .2s;
   }
   .preview-card:hover { transform: translateY(-4px) scale(1.02); }
-  @keyframes pop {
-    from { transform: scale(.94); opacity:0; }
-    to   { transform: scale(1); opacity:1; }
-  }
-
+  @keyframes pop { from { transform: scale(.94); opacity:0; } to { transform: scale(1); opacity:1; } }
   .preview-cover {
     height:160px; background-size:cover; background-position:center;
     position:relative; display:flex; align-items:flex-end;
@@ -92,8 +73,7 @@
   }
   .preview-cover::after {
     content:''; position:absolute; inset:0;
-    background: linear-gradient(to top, rgba(15,33,53,1),
-                rgba(15,33,53,.3) 60%, transparent);
+    background: linear-gradient(to top, rgba(15,33,53,1), rgba(15,33,53,.3) 60%, transparent);
   }
   .preview-cover h3 {
     position:relative; z-index:2; color:#fff;
@@ -101,11 +81,9 @@
     text-shadow:0 2px 10px rgba(0,0,0,.7);
     display:flex; align-items:center; gap:.4rem;
   }
-
   .preview-body { padding: 1rem 1.2rem 1.2rem; }
   .preview-desc {
-    color:#9fc0dd; font-size:.88rem; line-height:1.6;
-    margin-bottom:.9rem;
+    color:#9fc0dd; font-size:.88rem; line-height:1.6; margin-bottom:.9rem;
     display:-webkit-box; -webkit-line-clamp:2;
     -webkit-box-orient:vertical; overflow:hidden;
   }
@@ -116,19 +94,16 @@
   .preview-cta .arrow { transition: transform .2s; }
   .preview-card:hover .arrow { transform: translateX(4px); }
 
-  /* ===== 二级：详细攻略全屏页 ===== */
   .detail-overlay {
     position:fixed; inset:0; background:#081422;
     display:none; z-index:1000; overflow-y:auto;
   }
   .detail-overlay.active { display:block; }
-
   .detail-page {
     max-width:760px; margin:0 auto; padding-bottom:3rem;
     animation: fadeIn .3s ease;
   }
   @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-
   .detail-hero {
     height:280px; background-size:cover; background-position:center;
     position:relative; display:flex; align-items:flex-end;
@@ -136,8 +111,7 @@
   }
   .detail-hero::after {
     content:''; position:absolute; inset:0;
-    background: linear-gradient(to top, #081422 5%,
-                rgba(8,20,34,.4) 50%, rgba(8,20,34,.2));
+    background: linear-gradient(to top, #081422 5%, rgba(8,20,34,.4) 50%, rgba(8,20,34,.2));
   }
   .detail-hero h1 {
     position:relative; z-index:2; color:#fff;
@@ -145,7 +119,6 @@
     text-shadow:0 2px 16px rgba(0,0,0,.8);
     display:flex; align-items:center; gap:.6rem;
   }
-
   .detail-close {
     position:fixed; top:1rem; right:1rem; z-index:1100;
     background:rgba(10,25,40,.8); border:none; color:#cfe3f7;
@@ -154,15 +127,12 @@
     transition:.2s;
   }
   .detail-close:hover { background:#2e5b80; color:#fff; transform:rotate(90deg); }
-
   .detail-body { padding: 1.6rem 1.8rem; }
-
   .detail-intro {
     color:#b8d2e8; font-size:1rem; line-height:1.8;
     margin-bottom:1.6rem; padding-bottom:1.2rem;
     border-bottom:1px solid #1e3a55;
   }
-
   .section-title {
     display:flex; align-items:center; gap:.6rem;
     font-size:1.15rem; font-weight:600; color:#fff;
@@ -172,7 +142,6 @@
     width:4px; height:20px; border-radius:4px;
     background: linear-gradient(#4fa3e3,#7fd0ff);
   }
-
   .itinerary { position:relative; padding-left:1.6rem; }
   .itinerary::before {
     content:''; position:absolute; left:6px; top:8px; bottom:8px;
@@ -185,12 +154,8 @@
     background:#4fa3e3; border:2px solid #0f2135;
     box-shadow:0 0 0 2px #2a5a80;
   }
-  .day-label {
-    color:#7fd0ff; font-weight:600; font-size:.9rem;
-    margin-bottom:.25rem;
-  }
+  .day-label { color:#7fd0ff; font-weight:600; font-size:.9rem; margin-bottom:.25rem; }
   .day-text { color:#c5dcef; font-size:.9rem; line-height:1.6; }
-
   .spot-list {
     display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
     gap:1rem;
@@ -204,26 +169,16 @@
     border-color:#3f7ba8; transform:translateY(-3px);
     box-shadow:0 12px 24px -10px rgba(0,0,0,.7);
   }
-  .spot-img {
-    height:120px; background-size:cover; background-position:center;
-    background-color:#1a3a55;
-  }
+  .spot-img { height:120px; background-size:cover; background-position:center; background-color:#1a3a55; }
   .spot-info { padding:.8rem .9rem 1rem; }
-  .spot-info .name {
-    color:#e6f2ff; font-weight:600; font-size:.95rem;
-    margin-bottom:.3rem;
-  }
-  .spot-info .desc {
-    color:#8fb2ce; font-size:.8rem; line-height:1.5;
-    margin-bottom:.5rem;
-  }
+  .spot-info .name { color:#e6f2ff; font-weight:600; font-size:.95rem; margin-bottom:.3rem; }
+  .spot-info .desc { color:#8fb2ce; font-size:.8rem; line-height:1.5; margin-bottom:.5rem; }
   .spot-meta { display:flex; gap:.5rem; flex-wrap:wrap; }
   .spot-meta span {
     font-size:.72rem; color:#9fc0dd;
     background:#0f2135; padding:.2rem .55rem;
     border-radius:1rem; border:1px solid #1d3a55;
   }
-
   .food-tags { display:flex; flex-wrap:wrap; gap:.6rem; }
   .food-tag {
     background: linear-gradient(135deg,#1e4060,#2a5a80);
@@ -231,7 +186,6 @@
     padding:.45rem 1rem; border-radius:2rem;
     border:1px solid #2f6490;
   }
-
   .tips-box {
     background: rgba(255,200,80,.08);
     border-left:3px solid #f0b840;
@@ -239,7 +193,6 @@
     color:#ffe6b0; font-size:.9rem; line-height:1.8;
   }
   .tips-box li { margin-left:1rem; margin-bottom:.3rem; }
-
   .detail-footer {
     display:flex; gap:.8rem; flex-wrap:wrap;
     margin-top:1.8rem; padding-top:1.2rem;
@@ -250,8 +203,6 @@
     border-radius:2rem; padding:.4rem 1rem;
     font-size:.82rem; color:#9fc0dd;
   }
-
-  /* 轻提示 */
   #toast {
     position:fixed; left:50%; bottom:2rem; transform:translateX(-50%);
     background:rgba(20,45,70,.95); color:#cfe3f7;
@@ -263,7 +214,6 @@
     transition:opacity .3s, transform .3s;
   }
   #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
   @media (max-width:600px) {
     .map-container { padding:1rem; }
     .map-header h1 { font-size:1.25rem; }
@@ -281,144 +231,80 @@
     <h1>🗺️ 中国旅游攻略地图</h1>
     <p>点击省份 · 预览 · 查看详细攻略</p>
   </div>
-
   <div id="mapWrap">
-    <div style="padding:3rem;text-align:center;color:#7fa6c9;">
-      正在加载中国地图...
-    </div>
+    <div style="padding:3rem;text-align:center;color:#7fa6c9;">正在加载中国地图...</div>
   </div>
 </div>
 
-<!-- 一级：预览弹窗 -->
 <div class="preview-overlay" id="previewOverlay">
   <div class="preview-card" id="previewCard">
-    <div class="preview-cover" id="previewCover">
-      <h3 id="previewTitle"></h3>
-    </div>
+    <div class="preview-cover" id="previewCover"><h3 id="previewTitle"></h3></div>
     <div class="preview-body">
       <div class="preview-desc" id="previewDesc"></div>
-      <div class="preview-cta">
-        <span>查看详细攻略</span>
-        <span class="arrow">→</span>
-      </div>
+      <div class="preview-cta"><span>查看详细攻略</span><span class="arrow">→</span></div>
     </div>
   </div>
 </div>
 
-<!-- 二级：详细攻略全屏页 -->
 <div class="detail-overlay" id="detailOverlay">
   <button class="detail-close" id="detailClose">✕</button>
   <div class="detail-page" id="detailPage"></div>
 </div>
 
-<!-- 轻提示 -->
 <div id="toast"></div>
 
-<!-- D3 -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script>
-/* =========================================================
-   🌟 攻略数据：key 用省份中文名（和 GeoJSON 的 properties.name 完全一致）
-   ========================================================= */
+/* 攻略数据 */
 const regionData = {
-
   '北京市': {
-    name: '北京',
-    emoji: '🏯',
+    name: '北京', emoji: '🏯',
     cover: 'https://picsum.photos/id/1015/900/500',
     preview: '古都新貌，故宫、长城、胡同与烤鸭。',
-    intro: '北京是中国的首都，拥有 3000 多年建城史和 800 多年建都史。故宫、天坛、长城、颐和园等世界文化遗产云集，胡同与四合院保留着老北京的生活气息。',
+    intro: '北京是中国的首都，拥有 3000 多年建城史和 800 多年建都史。',
     itinerary: [
       { day: 'Day 1', text: '天安门广场 → 故宫 → 景山公园看日落。' },
-      { day: 'Day 2', text: '八达岭长城一日游。' },
-      { day: 'Day 3', text: '天坛 → 前门大街 → 胡同漫步。' }
+      { day: 'Day 2', text: '八达岭长城一日游。' }
     ],
     spots: [
-      { name: '故宫', desc: '明清两代皇宫', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '约60元' },
-      { name: '八达岭长城', desc: '世界文化遗产', img: 'https://picsum.photos/id/1016/400/250', time: '1天', ticket: '约40元' },
-      { name: '天坛', desc: '皇帝祭天场所', img: 'https://picsum.photos/id/1018/400/250', time: '2-3小时', ticket: '约15元' }
+      { name: '故宫', desc: '明清两代皇宫', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '约60元' }
     ],
-    foods: ['北京烤鸭', '炸酱面', '豆汁儿', '卤煮', '涮羊肉'],
-    tips: [
-      '故宫、国博等热门景点需提前 7 天官网预约',
-      '地铁出行最方便，早晚高峰注意错峰',
-      '胡同里的小吃比景区更地道'
-    ],
+    foods: ['北京烤鸭', '炸酱面', '涮羊肉'],
+    tips: ['故宫需提前 7 天官网预约', '地铁出行最方便'],
     info: { best: '4-5月 / 9-10月', lang: '普通话', currency: '人民币' }
   },
-
   '广东省': {
-    name: '广东',
-    emoji: '🍵',
+    name: '广东', emoji: '🍵',
     cover: 'https://picsum.photos/id/1016/900/500',
     preview: '早茶、粤菜、海岸线与岭南文化。',
-    intro: '广东是中国南方的经济大省，也是美食天堂。广州的早茶、潮汕的牛肉火锅、顺德的粤菜，加上深圳的现代都市和珠海的海岛风光，适合慢节奏深度游。',
-    itinerary: [
-      { day: 'Day 1', text: '广州：陈家祠 → 上下九 → 珠江夜游。' },
-      { day: 'Day 2', text: '广州早茶 → 沙面岛 → 广州塔。' },
-      { day: 'Day 3', text: '潮汕：牌坊街 → 广济桥 → 牛肉火锅。' }
-    ],
+    intro: '广东是中国南方的经济大省，也是美食天堂。',
+    itinerary: [{ day: 'Day 1', text: '广州：陈家祠 → 上下九 → 珠江夜游。' }],
     spots: [
-      { name: '广州塔', desc: '小蛮腰地标', img: 'https://picsum.photos/id/1018/400/250', time: '2小时', ticket: '约150元' },
-      { name: '陈家祠', desc: '岭南建筑艺术', img: 'https://picsum.photos/id/1019/400/250', time: '2小时', ticket: '约10元' },
-      { name: '广济桥', desc: '潮州古桥', img: 'https://picsum.photos/id/1000/400/250', time: '1-2小时', ticket: '约20元' }
+      { name: '广州塔', desc: '小蛮腰地标', img: 'https://picsum.photos/id/1018/400/250', time: '2小时', ticket: '约150元' }
     ],
-    foods: ['早茶', '烧鹅', '牛肉火锅', '肠粉', '双皮奶'],
-    tips: [
-      '早茶一般上午 6-11 点，去老字号茶楼体验最地道',
-      '夏季湿热，注意防晒和补水',
-      '潮汕地区方言多，普通话基本通用'
-    ],
+    foods: ['早茶', '烧鹅', '肠粉'],
+    tips: ['早茶一般上午 6-11 点', '夏季湿热注意防晒'],
     info: { best: '10月-次年3月', lang: '普通话/粤语', currency: '人民币' }
   },
-
   '四川省': {
-    name: '四川',
-    emoji: '🐼',
+    name: '四川', emoji: '🐼',
     cover: 'https://picsum.photos/id/1019/900/500',
     preview: '火锅、熊猫、九寨沟与雪山。',
-    intro: '四川是美食与自然景观的宝库。成都的悠闲、九寨沟的童话世界、峨眉山的云海、稻城亚丁的雪山，加上无处不在的火锅，是深度旅行的绝佳目的地。',
-    itinerary: [
-      { day: 'Day 1', text: '成都：宽窄巷子 → 锦里 → 火锅。' },
-      { day: 'Day 2', text: '大熊猫繁育研究基地 → 春熙路。' },
-      { day: 'Day 3', text: '都江堰 → 青城山。' },
-      { day: 'Day 4', text: '九寨沟一日游（需提前订票）。' }
-    ],
+    intro: '四川是美食与自然景观的宝库。',
+    itinerary: [{ day: 'Day 1', text: '成都：宽窄巷子 → 锦里 → 火锅。' }],
     spots: [
-      { name: '大熊猫基地', desc: '看熊猫最佳地点', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '约55元' },
-      { name: '九寨沟', desc: '童话世界', img: 'https://picsum.photos/id/1016/400/250', time: '1天', ticket: '约169元' },
-      { name: '峨眉山', desc: '佛教名山', img: 'https://picsum.photos/id/1018/400/250', time: '2天', ticket: '约160元' }
+      { name: '大熊猫基地', desc: '看熊猫最佳地点', img: 'https://picsum.photos/id/1015/400/250', time: '半天', ticket: '约55元' }
     ],
-    foods: ['火锅', '串串香', '担担面', '龙抄手', '兔头'],
-    tips: [
-      '九寨沟、黄龙需提前网上订票，旺季一票难求',
-      '高原地区注意防晒和高反',
-      '成都茶馆文化值得体验'
-    ],
+    foods: ['火锅', '串串香', '担担面'],
+    tips: ['九寨沟需提前订票', '高原地区注意防晒'],
     info: { best: '3-5月 / 9-11月', lang: '普通话/四川话', currency: '人民币' }
   }
-
-  /* ===== 其他省份按同样格式继续加 ===== */
-  // '上海市': { ... },
-  // '浙江省': { ... },
-  // '云南省': { ... },
-
 };
 
-/* =========================================================
-   渲染地图
-   ========================================================= */
-const mapWrap = document.getElementById('mapWrap');
-
-// 用等积圆锥投影，适合中国地图
+/* 渲染 */
 const width = 960, height = 720;
-const projection = d3.geoMercator()
-  .center([104, 36])
-  .scale(160)
-  .translate([width / 2, height / 2]);
-
-const path = d3.geoPath().projection(projection);
+const mapWrap = document.getElementById('mapWrap');
 
 const svg = d3.select('#mapWrap')
   .html('')
@@ -428,13 +314,16 @@ const svg = d3.select('#mapWrap')
   .attr('preserveAspectRatio', 'xMidYMid meet');
 
 d3.json('./china-provinces.json').then(china => {
+  // 过滤：只保留省级行政区
   const features = china.features.filter(f => {
-    // 跳过南海诸岛示意线（name 为空、adcode 含 JD）
-    if (!f.properties.name && String(f.properties.adcode).includes('JD')) return false;
-    // 跳过 name 为空的 feature
     if (!f.properties.name) return false;
     return true;
   });
+
+  // 关键：用 fitSize 自动适应，不管数据多大都会自动缩放
+  const collection = { type: 'FeatureCollection', features: features };
+  const projection = d3.geoMercator().fitSize([width - 40, height - 40], collection);
+  const path = d3.geoPath().projection(projection);
 
   // 绘制省份
   svg.append('g')
@@ -455,7 +344,7 @@ d3.json('./china-provinces.json').then(china => {
       }
     });
 
-  // 南海诸岛示意线（用虚线表示）
+  // 南海诸岛虚线
   const nanhai = china.features.filter(f =>
     !f.properties.name && String(f.properties.adcode).includes('JD')
   );
@@ -470,14 +359,10 @@ d3.json('./china-provinces.json').then(china => {
 
 }).catch(err => {
   console.error(err);
-  mapWrap.innerHTML = '<div style="padding:3rem;text-align:center;color:#ff9e9e;">' +
-    '地图加载失败，请确认 china-provinces.json 和 HTML 在同一目录，' +
-    '并通过本地服务器打开页面。</div>';
+  mapWrap.innerHTML = '<div style="padding:3rem;text-align:center;color:#ff9e9e;">地图加载失败，请检查 china-provinces.json</div>';
 });
 
-/* =========================================================
-   一级：预览弹窗
-   ========================================================= */
+/* 预览弹窗 */
 const previewOverlay = document.getElementById('previewOverlay');
 const previewCard    = document.getElementById('previewCard');
 const previewCover   = document.getElementById('previewCover');
@@ -489,12 +374,10 @@ let currentKey = null;
 function openPreview(key) {
   const data = regionData[key];
   if (!data) return;
-
   currentKey = key;
   previewCover.style.backgroundImage = `url('${data.cover}')`;
   previewTitle.innerHTML = `<span>${data.emoji}</span>${data.name}`;
   previewDesc.textContent = data.preview || data.intro;
-
   previewOverlay.classList.add('active');
 }
 
@@ -508,9 +391,7 @@ previewOverlay.addEventListener('click', e => {
   if (e.target === previewOverlay) previewOverlay.classList.remove('active');
 });
 
-/* =========================================================
-   二级：详细攻略
-   ========================================================= */
+/* 详情页 */
 const detailOverlay = document.getElementById('detailOverlay');
 const detailPage    = document.getElementById('detailPage');
 const detailClose   = document.getElementById('detailClose');
@@ -585,9 +466,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* =========================================================
-   轻提示
-   ========================================================= */
+/* 轻提示 */
 const toast = document.getElementById('toast');
 let toastTimer = null;
 
